@@ -14,7 +14,7 @@ sealed class Screen(val route: String) {
     object Login : Screen("login")
     object Register : Screen("register")
     object Home : Screen("home")
-}   
+}
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
@@ -36,7 +36,6 @@ fun AppNavigation(navController: NavHostController) {
                 },
                 onLoginClick = {
                     navController.navigate(Screen.Home.route) {
-                        // Clear back stack so user can't go back to login
                         popUpTo(Screen.Intro.route) { inclusive = true }
                     }
                 }
@@ -49,7 +48,6 @@ fun AppNavigation(navController: NavHostController) {
                 },
                 onRegisterClick = {
                     navController.navigate(Screen.Home.route) {
-                        // Clear back stack so user can't go back to register
                         popUpTo(Screen.Intro.route) { inclusive = true }
                     }
                 }
