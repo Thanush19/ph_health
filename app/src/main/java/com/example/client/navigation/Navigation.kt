@@ -1,9 +1,13 @@
 package com.example.client.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.client.data.local.TokenManager
 import com.example.client.screens.Home
 import com.example.client.screens.IntroScreen
 import com.example.client.screens.Login
@@ -18,9 +22,16 @@ sealed class Screen(val route: String) {
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
+    val context = LocalContext.current
+    val tokenManager = remember { TokenManager(context.applicationContext) }
+    
+    val isLoggedIn = remember { tokenManager.isLoggedIn() }
+    
+    val startDestination = if (isLoggedIn) Screen.Home.route else Screen.Intro.route
+    
     NavHost(
         navController = navController,
-        startDestination = Screen.Intro.route
+        startDestination = startDestination
     ) {
         composable(Screen.Intro.route) {
             IntroScreen(

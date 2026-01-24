@@ -2,6 +2,7 @@ package com.example.client.data.local
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 
 class TokenManager(context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences(
@@ -10,7 +11,7 @@ class TokenManager(context: Context) {
     )
 
     fun saveToken(token: String) {
-        prefs.edit().putString("auth_token", token).apply()
+        prefs.edit { putString("auth_token", token) }
     }
 
     fun getToken(): String? {
@@ -18,7 +19,7 @@ class TokenManager(context: Context) {
     }
 
     fun clearToken() {
-        prefs.edit().remove("auth_token").apply()
+        prefs.edit { remove("auth_token") }
     }
 
     fun isLoggedIn(): Boolean {

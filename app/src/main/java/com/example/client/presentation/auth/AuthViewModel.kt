@@ -1,9 +1,15 @@
 package com.example.client.presentation.auth
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.client.data.local.TokenManager
+import com.example.client.data.model.AuthResponse
 import com.example.client.data.model.LoginRequest
 import com.example.client.data.model.RegisterRequest
 import com.example.client.data.repository.AuthRepository
@@ -91,4 +97,43 @@ class AuthViewModel @Inject constructor(
     private fun handleClearError() {
         state.errorMessage = null
     }
+}
+
+sealed class AuthEvent {
+    data class Register(val request: RegisterRequest) : AuthEvent()
+    data class Login(val request: LoginRequest) : AuthEvent()
+    object ClearError : AuthEvent()
+}
+
+
+
+@Stable
+internal class AuthState {
+    var isLoading by mutableStateOf(false)
+    var errorMessage by mutableStateOf<String?>(null)
+    var authResponse by mutableStateOf<AuthResponse?>(null)
+    var event by mutableStateOf<AuthUiEvent?>(null)
+
+    internal fun toUi(): AuthUiModel {
+        return AuthUiModel(
+            isLoading = isLoading,
+            errorMessage = errorMessage,
+            authResponse = authResponse,
+            event = event
+        )
+    }
+}
+
+@Immutable
+internal data class AuthUiModel(
+    val isLoading: Boolean,
+    val errorMessage: String?,
+    val authResponse: AuthResponse?,
+    val event: AuthUiEvent?
+)
+
+@Stable
+internal sealed interface AuthUiEvent {
+    @Immutable
+    data object NavigateToHome : AuthUiEvent
 }
