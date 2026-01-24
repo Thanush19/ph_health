@@ -34,7 +34,7 @@ fun AppNavigation(navController: NavHostController) {
                 onSignUpClick = {
                     navController.navigate(Screen.Register.route)
                 },
-                onLoginClick = {
+                onLoginSuccess = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Intro.route) { inclusive = true }
                     }
@@ -46,7 +46,7 @@ fun AppNavigation(navController: NavHostController) {
                 onLoginClick = {
                     navController.navigate(Screen.Login.route)
                 },
-                onRegisterClick = {
+                onRegisterSuccess = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Intro.route) { inclusive = true }
                     }
