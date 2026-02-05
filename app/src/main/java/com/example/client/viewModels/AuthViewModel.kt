@@ -1,4 +1,4 @@
-package com.example.client.presentation.auth
+package com.example.client.viewModels
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -8,6 +8,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import app.cash.molecule.RecompositionMode
+import app.cash.molecule.launchMolecule
 import com.example.client.data.local.TokenManager
 import com.example.client.data.model.AuthResponse
 import com.example.client.data.model.LoginRequest
@@ -15,6 +18,7 @@ import com.example.client.data.model.RegisterRequest
 import com.example.client.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
@@ -22,9 +26,20 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     val presenter: AuthPresenter
 ) : ViewModel() {
+    val uiModel: StateFlow<AuthUiModel> = viewModelScope.launchMolecule(RecompositionMode.Immediate) {
+        presenter.generateUi()
+    }
 
     fun takeEvent(event: AuthEvent) {
         presenter.onInteraction(event)
+    }
+
+    fun clearNavigationEvent() {
+        presenter.clearNavigationEvent()
+    }
+
+    companion object {
+        val InitialUiModel = AuthUiModel(isLoading = false, errorMessage = null, authResponse = null, event = null)
     }
 }
 
@@ -32,11 +47,15 @@ class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val tokenManager: TokenManager
 ) {
-    private val events = Channel<AuthEvent>(Channel.UNLIMITED)
+    private val events = Channel<AuthEvent>(5)
     private val state = AuthState()
 
     fun onInteraction(event: AuthEvent) {
         events.trySend(event)
+    }
+
+    fun clearNavigationEvent() {
+        state.event = null
     }
 
     @Composable
@@ -52,7 +71,6 @@ class AuthViewModel @Inject constructor(
                 when (event) {
                     is AuthEvent.Register -> handleRegister(event.request)
                     is AuthEvent.Login -> handleLogin(event.request)
-                    is AuthEvent.ClearError -> handleClearError()
                 }
             }
         }
@@ -94,15 +112,11 @@ class AuthViewModel @Inject constructor(
             }
     }
 
-    private fun handleClearError() {
-        state.errorMessage = null
-    }
 }
 
 sealed class AuthEvent {
     data class Register(val request: RegisterRequest) : AuthEvent()
     data class Login(val request: LoginRequest) : AuthEvent()
-    object ClearError : AuthEvent()
 }
 
 
@@ -125,7 +139,7 @@ internal class AuthState {
 }
 
 @Immutable
-internal data class AuthUiModel(
+data class AuthUiModel(
     val isLoading: Boolean,
     val errorMessage: String?,
     val authResponse: AuthResponse?,
@@ -133,7 +147,7 @@ internal data class AuthUiModel(
 )
 
 @Stable
-internal sealed interface AuthUiEvent {
+sealed interface AuthUiEvent {
     @Immutable
     data object NavigateToHome : AuthUiEvent
 }

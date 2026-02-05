@@ -29,10 +29,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.collectAsState
 import com.example.client.data.model.LoginRequest
-import com.example.client.presentation.auth.AuthEvent
-import com.example.client.presentation.auth.AuthUiEvent
-import com.example.client.presentation.auth.AuthViewModel
+import com.example.client.viewModels.AuthEvent
+import com.example.client.viewModels.AuthUiEvent
+import com.example.client.viewModels.AuthViewModel
 
 @Composable
 fun Login(
@@ -43,14 +44,16 @@ fun Login(
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
 
-    val uiModel = viewModel.presenter.generateUi()
+    val uiModel by viewModel.uiModel.collectAsState(initial = AuthViewModel.InitialUiModel)
 
     LaunchedEffect(uiModel.event) {
         when (uiModel.event) {
             is AuthUiEvent.NavigateToHome -> {
                 onLoginSuccess()
+                viewModel.clearNavigationEvent()
             }
-            null -> {}
+
+            else -> {}
         }
     }
 
