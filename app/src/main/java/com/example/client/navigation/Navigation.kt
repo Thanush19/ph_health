@@ -12,6 +12,7 @@ import com.example.client.screens.Home
 import com.example.client.screens.IntroScreen
 import com.example.client.screens.Login
 import com.example.client.screens.Register
+import com.example.client.screens.FindParking
 import com.example.client.screens.RentSpace
 
 sealed class Screen(val route: String) {
@@ -20,6 +21,7 @@ sealed class Screen(val route: String) {
     object Register : Screen("register")
     object Home : Screen("home")
     object RentSpace : Screen("rent_space")
+    object FindParking : Screen("find_parking")
 }
 
 @Composable
@@ -69,11 +71,16 @@ fun AppNavigation(navController: NavHostController) {
         composable(Screen.Home.route) {
             Home(
                 onRentSpaceClick = { navController.navigate(Screen.RentSpace.route) },
-                onFindParkingClick = { }
+                onFindParkingClick = { navController.navigate(Screen.FindParking.route) }
             )
         }
         composable(Screen.RentSpace.route) {
             RentSpace(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable(Screen.FindParking.route) {
+            FindParking(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

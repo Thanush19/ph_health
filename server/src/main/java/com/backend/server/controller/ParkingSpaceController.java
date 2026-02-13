@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/spaces")
@@ -27,6 +28,11 @@ public class ParkingSpaceController {
     public ResponseEntity<ImageUploadResponse> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
         ImageUploadResponse response = parkingSpaceService.uploadImage(file);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<SpaceResponse>> listSpaces() {
+        return ResponseEntity.ok(parkingSpaceService.listAllSpaces());
     }
 
     @PostMapping

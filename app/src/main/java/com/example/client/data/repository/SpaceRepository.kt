@@ -33,6 +33,19 @@ class SpaceRepository @Inject constructor(
         }
     }
 
+    suspend fun getSpaces(): Result<List<SpaceResponse>> {
+        return try {
+            val response = apiService.getSpaces()
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Failed to load spaces: ${response.errorBody()?.string() ?: "Unknown error"}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun createSpace(request: CreateSpaceRequest): Result<SpaceResponse> {
         return try {
             val response = apiService.createSpace(request)

@@ -48,8 +48,8 @@ public class ParkingSpace {
     @Column(name = "rent_monthly", precision = 10, scale = 2)
     private BigDecimal rentMonthly;
 
-    /** Comma-separated image URLs (max 3) */
-    @Column(name = "image_urls", length = 2000)
+    /** Comma-separated image URLs (max 3). Uses image_url column for backward compatibility. */
+    @Column(name = "image_url", length = 2000)
     private String imageUrls;
 
     @Column(name = "created_at", nullable = false, updatable = false)

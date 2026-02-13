@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.math.BigDecimal;
 
 @Data
@@ -37,5 +39,6 @@ public class CreateSpaceRequest {
     private BigDecimal rentMonthly;
 
     /** Cloudinary image URLs after upload (max 3) */
+    @JsonProperty("imageUrls")
     private java.util.List<String> imageUrls;
 }

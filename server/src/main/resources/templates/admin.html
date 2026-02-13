@@ -157,12 +157,91 @@
             border-radius: 3px;
             font-family: 'Courier New', monospace;
         }
+
+        .endpoint-index {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #e8f4f8;
+            border-radius: 8px;
+            border-left: 4px solid #0d6efd;
+        }
+
+        .endpoint-index h2 {
+            color: #0d6efd;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .endpoint-index ul {
+            list-style: none;
+        }
+
+        .endpoint-index li {
+            padding: 6px 0;
+            border-bottom: 1px solid #bee5eb;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .endpoint-index li:last-child { border-bottom: none; }
+
+        .method {
+            font-weight: 700;
+            min-width: 52px;
+            font-size: 12px;
+        }
+
+        .method.get { color: #0d6efd; }
+        .method.post { color: #198754; }
+        .method.put { color: #fd7e14; }
+        .method.delete { color: #dc3545; }
+
+        .auth-badge {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #ffc107;
+            color: #000;
+        }
+
+        input[type="file"] {
+            padding: 8px;
+        }
+
+        .uploaded-urls {
+            margin-top: 10px;
+            padding: 10px;
+            background: #d1e7dd;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+
+        .uploaded-urls span {
+            display: block;
+            word-break: break-all;
+            margin-bottom: 4px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔧 API Admin Panel</h1>
-        <p class="subtitle">Test all backend APIs from here</p>
+        <h1>🔧 API Dashboard</h1>
+        <p class="subtitle">Test all backend endpoints from one place</p>
+
+        <!-- Endpoint index -->
+        <div class="endpoint-index">
+            <h2>📋 All endpoints</h2>
+            <ul>
+                <li><span class="method get">GET</span> <code>/</code></li>
+                <li><span class="method post">POST</span> <code>/api/auth/register</code></li>
+                <li><span class="method post">POST</span> <code>/api/auth/login</code></li>
+                <li><span class="method post">POST</span> <code>/api/auth/logout</code> <span class="auth-badge">JWT</span></li>
+                <li><span class="method get">GET</span> <code>/api/spaces</code> <span class="auth-badge">JWT</span></li>
+                <li><span class="method post">POST</span> <code>/api/spaces/upload-image</code> <span class="auth-badge">JWT</span></li>
+                <li><span class="method post">POST</span> <code>/api/spaces</code> <span class="auth-badge">JWT</span></li>
+            </ul>
+        </div>
 
         <!-- Register API -->
         <div class="api-section">
@@ -232,11 +311,103 @@
             <button id="logoutBtn">Logout</button>
             <div id="logoutResponse" class="response" style="display: none;"></div>
         </div>
+
+        <!-- List Spaces API -->
+        <div class="api-section">
+            <h2>4. List all spaces</h2>
+            <div class="endpoint-info">
+                <strong>Endpoint:</strong> <code>GET /api/spaces</code> (requires login)
+            </div>
+            <button id="listSpacesBtn">List spaces</button>
+            <div id="listSpacesResponse" class="response" style="display: none;"></div>
+        </div>
+
+        <!-- Upload image API -->
+        <div class="api-section">
+            <h2>5. Upload image</h2>
+            <div class="endpoint-info">
+                <strong>Endpoint:</strong> <code>POST /api/spaces/upload-image</code> (multipart, requires login)
+            </div>
+            <div class="form-group">
+                <label>Image file:</label>
+                <input type="file" id="uploadImageFile" accept="image/*">
+            </div>
+            <button id="uploadImageBtn">Upload image</button>
+            <div id="uploadedUrlsBox" class="uploaded-urls" style="display: none;">
+                <strong>URLs for Create space (imageUrls):</strong>
+                <div id="uploadedUrlsList"></div>
+            </div>
+            <div id="uploadImageResponse" class="response" style="display: none;"></div>
+        </div>
+
+        <!-- Create space API -->
+        <div class="api-section">
+            <h2>6. Create space</h2>
+            <div class="endpoint-info">
+                <strong>Endpoint:</strong> <code>POST /api/spaces</code> (requires login). Upload images first and use URLs above, or leave imageUrls empty.
+            </div>
+            <form id="createSpaceForm">
+                <div class="form-group">
+                    <label>Address:</label>
+                    <input type="text" id="spaceAddress" required placeholder="e.g. 123 Main St">
+                </div>
+                <div class="form-group">
+                    <label>Square feet:</label>
+                    <input type="number" id="spaceSquareFeet" required min="1" placeholder="e.g. 500">
+                </div>
+                <div class="form-group">
+                    <label>Vehicle types (e.g. Car, Bike):</label>
+                    <input type="text" id="spaceVehicleTypes" required placeholder="Car, Bike">
+                </div>
+                <div class="form-group">
+                    <label>Rent per hour (optional):</label>
+                    <input type="number" id="spaceRentPerHour" min="0" step="0.01" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>Rent per day (optional):</label>
+                    <input type="number" id="spaceRentPerDay" min="0" step="0.01" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>Rent monthly (optional):</label>
+                    <input type="number" id="spaceRentMonthly" min="0" step="0.01" placeholder="3000">
+                </div>
+                <div class="form-group">
+                    <label>Image URLs (comma-separated, or use from Upload above):</label>
+                    <input type="text" id="spaceImageUrls" placeholder="Leave empty or paste URLs from uploads">
+                </div>
+                <button type="submit">Create space</button>
+            </form>
+            <div id="createSpaceResponse" class="response" style="display: none;"></div>
+        </div>
     </div>
 
     <script>
         const API_BASE_URL = window.location.origin;
         let currentToken = localStorage.getItem('authToken') || '';
+        let uploadedImageUrls = [];
+
+        function authHeaders() {
+            const h = { 'Content-Type': 'application/json' };
+            if (currentToken) h['Authorization'] = 'Bearer ' + currentToken;
+            return h;
+        }
+
+        /** Safely get response body as JSON or text (avoids "Unexpected end of JSON input" on empty/401). */
+        async function responseBody(response) {
+            const text = await response.text();
+            if (!text || text.trim() === '') return { _empty: true, _status: response.status };
+            try {
+                return JSON.parse(text);
+            } catch (_) {
+                return { _raw: text, _status: response.status };
+            }
+        }
+
+        function formatBody(result) {
+            if (result && result._empty) return '(Empty response)' + (result._status === 401 ? ' – Log in first.' : '');
+            if (result && result._raw !== undefined) return result._raw;
+            return JSON.stringify(result, null, 2);
+        }
 
         // Display token if exists
         if (currentToken) {
@@ -270,15 +441,11 @@
                     body: JSON.stringify(data)
                 });
 
-                const result = await response.json();
-                
-                if (response.ok) {
+                const result = await responseBody(response);
+                const display = formatBody(result);
+                if (response.ok && !result._empty && !result._raw) {
                     responseDiv.className = 'response success';
-                    responseDiv.innerHTML = `
-                        <h3>✅ Success (${response.status})</h3>
-                        <pre>${JSON.stringify(result, null, 2)}</pre>
-                    `;
-                    // Save token if received
+                    responseDiv.innerHTML = `<h3>✅ Success (${response.status})</h3><pre>${display}</pre>`;
                     if (result.token) {
                         currentToken = result.token;
                         localStorage.setItem('authToken', currentToken);
@@ -287,10 +454,7 @@
                     }
                 } else {
                     responseDiv.className = 'response error';
-                    responseDiv.innerHTML = `
-                        <h3>❌ Error (${response.status})</h3>
-                        <pre>${JSON.stringify(result, null, 2)}</pre>
-                    `;
+                    responseDiv.innerHTML = `<h3>❌ Error (${response.status})</h3><pre>${display}</pre>`;
                 }
             } catch (error) {
                 responseDiv.className = 'response error';
@@ -323,15 +487,11 @@
                     body: JSON.stringify(data)
                 });
 
-                const result = await response.json();
-                
-                if (response.ok) {
+                const result = await responseBody(response);
+                const display = formatBody(result);
+                if (response.ok && !result._empty && !result._raw) {
                     responseDiv.className = 'response success';
-                    responseDiv.innerHTML = `
-                        <h3>✅ Success (${response.status})</h3>
-                        <pre>${JSON.stringify(result, null, 2)}</pre>
-                    `;
-                    // Save token
+                    responseDiv.innerHTML = `<h3>✅ Success (${response.status})</h3><pre>${display}</pre>`;
                     if (result.token) {
                         currentToken = result.token;
                         localStorage.setItem('authToken', currentToken);
@@ -340,10 +500,7 @@
                     }
                 } else {
                     responseDiv.className = 'response error';
-                    responseDiv.innerHTML = `
-                        <h3>❌ Error (${response.status})</h3>
-                        <pre>${JSON.stringify(result, null, 2)}</pre>
-                    `;
+                    responseDiv.innerHTML = `<h3>❌ Error (${response.status})</h3><pre>${display}</pre>`;
                 }
             } catch (error) {
                 responseDiv.className = 'response error';
@@ -395,6 +552,113 @@
                     <h3>❌ Network Error</h3>
                     <pre>${error.message}</pre>
                 `;
+            }
+        });
+
+        // List spaces
+        document.getElementById('listSpacesBtn').addEventListener('click', async () => {
+            const responseDiv = document.getElementById('listSpacesResponse');
+            responseDiv.style.display = 'block';
+            responseDiv.className = 'response';
+            responseDiv.innerHTML = '<h3>Loading...</h3>';
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/spaces`, {
+                    method: 'GET',
+                    headers: authHeaders()
+                });
+                const result = await responseBody(response);
+                const display = formatBody(result);
+                if (response.ok && !result._empty && !result._raw) {
+                    responseDiv.className = 'response success';
+                    responseDiv.innerHTML = `<h3>✅ Success (${response.status}) – ${Array.isArray(result) ? result.length : 0} spaces</h3><pre>${display}</pre>`;
+                } else {
+                    responseDiv.className = 'response error';
+                    responseDiv.innerHTML = `<h3>❌ ${response.status === 401 ? 'Unauthorized – log in first' : 'Error'} (${response.status})</h3><pre>${display}</pre>`;
+                }
+            } catch (error) {
+                responseDiv.className = 'response error';
+                responseDiv.innerHTML = `<h3>❌ Network Error</h3><pre>${error.message}</pre>`;
+            }
+        });
+
+        // Upload image
+        document.getElementById('uploadImageBtn').addEventListener('click', async () => {
+            const fileInput = document.getElementById('uploadImageFile');
+            const responseDiv = document.getElementById('uploadImageResponse');
+            if (!fileInput.files || !fileInput.files[0]) {
+                responseDiv.style.display = 'block';
+                responseDiv.className = 'response error';
+                responseDiv.innerHTML = '<h3>❌ Please select an image file</h3>';
+                return;
+            }
+            responseDiv.style.display = 'block';
+            responseDiv.className = 'response';
+            responseDiv.innerHTML = '<h3>Loading...</h3>';
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            try {
+                const headers = {};
+                if (currentToken) headers['Authorization'] = 'Bearer ' + currentToken;
+                const response = await fetch(`${API_BASE_URL}/api/spaces/upload-image`, {
+                    method: 'POST',
+                    headers,
+                    body: formData
+                });
+                const result = await responseBody(response);
+                const display = formatBody(result);
+                if (response.ok && result && result.url) {
+                    uploadedImageUrls.push(result.url);
+                    document.getElementById('uploadedUrlsBox').style.display = 'block';
+                    document.getElementById('uploadedUrlsList').innerHTML = uploadedImageUrls.map((u, i) => `<span>${i + 1}. ${u}</span>`).join('');
+                    document.getElementById('spaceImageUrls').value = uploadedImageUrls.join(', ');
+                    responseDiv.className = 'response success';
+                    responseDiv.innerHTML = `<h3>✅ Success (${response.status})</h3><pre>${display}</pre>`;
+                } else {
+                    responseDiv.className = 'response error';
+                    responseDiv.innerHTML = `<h3>❌ ${response.status === 401 ? 'Unauthorized – log in first' : 'Error'} (${response.status})</h3><pre>${display}</pre>`;
+                }
+            } catch (error) {
+                responseDiv.className = 'response error';
+                responseDiv.innerHTML = `<h3>❌ Network Error</h3><pre>${error.message}</pre>`;
+            }
+        });
+
+        // Create space
+        document.getElementById('createSpaceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const responseDiv = document.getElementById('createSpaceResponse');
+            responseDiv.style.display = 'block';
+            responseDiv.className = 'response';
+            responseDiv.innerHTML = '<h3>Loading...</h3>';
+            const imageUrlsRaw = document.getElementById('spaceImageUrls').value.trim();
+            const imageUrls = imageUrlsRaw ? imageUrlsRaw.split(',').map(s => s.trim()).filter(Boolean) : (uploadedImageUrls.length ? uploadedImageUrls : null);
+            const data = {
+                address: document.getElementById('spaceAddress').value,
+                squareFeet: parseInt(document.getElementById('spaceSquareFeet').value, 10),
+                vehicleTypes: document.getElementById('spaceVehicleTypes').value,
+                rentPerHour: document.getElementById('spaceRentPerHour').value ? parseFloat(document.getElementById('spaceRentPerHour').value) : null,
+                rentPerDay: document.getElementById('spaceRentPerDay').value ? parseFloat(document.getElementById('spaceRentPerDay').value) : null,
+                rentMonthly: document.getElementById('spaceRentMonthly').value ? parseFloat(document.getElementById('spaceRentMonthly').value) : null,
+                imageUrls: imageUrls
+            };
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/spaces`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify(data)
+                });
+                const result = await responseBody(response);
+                const display = formatBody(result);
+                if (response.ok && !result._empty && !result._raw) {
+                    responseDiv.className = 'response success';
+                    responseDiv.innerHTML = `<h3>✅ Success (${response.status})</h3><pre>${display}</pre>`;
+                } else {
+                    responseDiv.className = 'response error';
+                    responseDiv.innerHTML = `<h3>❌ ${response.status === 401 ? 'Unauthorized – log in first' : 'Error'} (${response.status})</h3><pre>${display}</pre>`;
+                }
+            } catch (error) {
+                responseDiv.className = 'response error';
+                responseDiv.innerHTML = `<h3>❌ Network Error</h3><pre>${error.message}</pre>`;
             }
         });
     </script>

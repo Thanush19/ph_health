@@ -68,6 +68,12 @@ public class ParkingSpaceService {
         return toResponse(space);
     }
 
+    public List<SpaceResponse> listAllSpaces() {
+        return parkingSpaceRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
     private void validateAtLeastOneRentOption(BigDecimal perHour, BigDecimal perDay, BigDecimal monthly) {
         boolean hasAny = (perHour != null && perHour.compareTo(BigDecimal.ZERO) > 0)
                 || (perDay != null && perDay.compareTo(BigDecimal.ZERO) > 0)
