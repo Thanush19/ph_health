@@ -1,7 +1,9 @@
 package com.example.client.di
 
 import com.example.client.data.api.AuthApiService
+import com.example.client.data.api.SpaceApiService
 import com.example.client.data.repository.AuthRepository
+import com.example.client.data.repository.SpaceRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,5 +18,11 @@ object RepositoryModule {
     @Singleton
     fun provideAuthRepository(apiService: AuthApiService): AuthRepository {
         return AuthRepository(apiService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSpaceRepository(apiService: SpaceApiService): SpaceRepository {
+        return SpaceRepository(apiService)
     }
 }

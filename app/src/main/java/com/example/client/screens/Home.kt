@@ -17,7 +17,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Home() {
+fun Home(
+    onRentSpaceClick: () -> Unit = {},
+    onFindParkingClick: () -> Unit = {}
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -29,14 +32,20 @@ fun Home() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
         ) {
-            Button(onClick = { },
-                Modifier.width(80.dp).height(40.dp)
-                ) {
+            Button(
+                onClick = onRentSpaceClick,
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .height(48.dp)
+            ) {
                 Text("Rent Your Space")
             }
 
-            Button(onClick = { },
-                Modifier.width(80.dp).height(40.dp)
+            Button(
+                onClick = onFindParkingClick,
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .height(48.dp)
             ) {
                 Text("Find your parking place")
             }
@@ -47,5 +56,5 @@ fun Home() {
 @Preview
 @Composable
 fun HomePreview() {
-    Home()
+    Home(onRentSpaceClick = {}, onFindParkingClick = {})
 }
