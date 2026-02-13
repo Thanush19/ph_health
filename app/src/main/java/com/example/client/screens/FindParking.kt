@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
@@ -34,6 +35,7 @@ import com.example.client.viewModels.FindParkingViewModel
 @Composable
 fun FindParking(
     onNavigateBack: () -> Unit = {},
+    onSpaceClick: (SpaceResponse) -> Unit = {},
     viewModel: FindParkingViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -85,7 +87,10 @@ fun FindParking(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(uiState.spaces, key = { it.id }) { space ->
-                        ParkingSpaceCard(space = space)
+                        ParkingSpaceCard(
+                            space = space,
+                            onClick = { onSpaceClick(space) }
+                        )
                     }
                 }
             }
@@ -110,11 +115,16 @@ private fun TopBar(
 }
 
 @Composable
-private fun ParkingSpaceCard(space: SpaceResponse) {
+private fun ParkingSpaceCard(
+    space: SpaceResponse,
+    onClick: () -> Unit = {}
+) {
     val firstImageUrl = space.imageUrls?.firstOrNull()
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
