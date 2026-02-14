@@ -9,12 +9,20 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
+import retrofit2.http.Path
 
 interface SpaceApiService {
 
     @GET("api/spaces")
     suspend fun getSpaces(): Response<List<SpaceResponse>>
+
+    @GET("api/spaces/mine")
+    suspend fun getMySpaces(): Response<List<SpaceResponse>>
+
+    @GET("api/spaces/{id}")
+    suspend fun getSpaceById(@Path("id") id: Long): Response<SpaceResponse>
 
     @Multipart
     @POST("api/spaces/upload-image")
@@ -22,4 +30,7 @@ interface SpaceApiService {
 
     @POST("api/spaces")
     suspend fun createSpace(@Body request: CreateSpaceRequest): Response<SpaceResponse>
+
+    @PUT("api/spaces/{id}")
+    suspend fun updateSpace(@Path("id") id: Long, @Body request: CreateSpaceRequest): Response<SpaceResponse>
 }

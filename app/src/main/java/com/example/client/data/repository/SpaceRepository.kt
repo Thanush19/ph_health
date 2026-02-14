@@ -46,6 +46,32 @@ class SpaceRepository @Inject constructor(
         }
     }
 
+    suspend fun getMySpaces(): Result<List<SpaceResponse>> {
+        return try {
+            val response = apiService.getMySpaces()
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Failed to load your spaces: ${response.errorBody()?.string() ?: "Unknown error"}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getSpaceById(id: Long): Result<SpaceResponse> {
+        return try {
+            val response = apiService.getSpaceById(id)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Space not found"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun createSpace(request: CreateSpaceRequest): Result<SpaceResponse> {
         return try {
             val response = apiService.createSpace(request)
@@ -53,6 +79,19 @@ class SpaceRepository @Inject constructor(
                 Result.success(response.body()!!)
             } else {
                 Result.failure(Exception("Create space failed: ${response.errorBody()?.string() ?: "Unknown error"}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateSpace(id: Long, request: CreateSpaceRequest): Result<SpaceResponse> {
+        return try {
+            val response = apiService.updateSpace(id, request)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Update failed: ${response.errorBody()?.string() ?: "Unknown error"}"))
             }
         } catch (e: Exception) {
             Result.failure(e)

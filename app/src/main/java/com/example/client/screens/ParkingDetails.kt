@@ -1,5 +1,6 @@
 package com.example.client.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,7 +41,9 @@ import com.example.client.data.model.SpaceResponse
 @Composable
 fun ParkingDetails(
     space: SpaceResponse?,
-    onNavigateBack: () -> Unit = {}
+    onNavigateBack: () -> Unit = {},
+    canEdit: Boolean = false,
+    onEditClick: () -> Unit = {}
 ) {
     if (space == null) {
         Box(
@@ -53,7 +56,12 @@ fun ParkingDetails(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        TopBar(title = "Parking details", onBackClick = onNavigateBack)
+        TopBar(
+            title = "Parking details",
+            onBackClick = onNavigateBack,
+            showEdit = canEdit,
+            onEditClick = onEditClick
+        )
 
         Column(
             modifier = Modifier
@@ -113,18 +121,28 @@ fun ParkingDetails(
 @Composable
 private fun TopBar(
     title: String,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    showEdit: Boolean = false,
+    onEditClick: () -> Unit = {}
 ) {
     TopAppBar(
-        title = { Text(title, style = MaterialTheme.typography.titleLarge) },
+        title = { Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold) },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
-                Text("←", style = MaterialTheme.typography.titleLarge)
+                Text("←", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
+            }
+        },
+        actions = {
+            if (showEdit) {
+                IconButton(onClick = onEditClick) {
+                    Text("Edit", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                }
             }
         }
     )
 }
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 private fun ImageCarousel(imageUrls: List<String>?) {
     val urls = imageUrls?.filter { it.isNotBlank() }.orEmpty()

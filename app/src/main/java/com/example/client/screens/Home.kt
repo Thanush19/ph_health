@@ -22,12 +22,13 @@ import com.example.client.ui.components.ParkingPrimaryButton
 @Composable
 fun Home(
     onRentSpaceClick: () -> Unit = {},
-    onFindParkingClick: () -> Unit = {}
+    onFindParkingClick: () -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .padding(32.dp),
+            .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(

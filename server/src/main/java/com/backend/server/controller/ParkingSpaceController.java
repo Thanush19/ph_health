@@ -35,11 +35,30 @@ public class ParkingSpaceController {
         return ResponseEntity.ok(parkingSpaceService.listAllSpaces());
     }
 
+    @GetMapping("/mine")
+    public ResponseEntity<List<SpaceResponse>> listMySpaces() {
+        return ResponseEntity.ok(parkingSpaceService.listMySpaces(getCurrentUsername()));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<SpaceResponse> getSpace(@PathVariable Long id) {
+        return ResponseEntity.ok(parkingSpaceService.getById(id));
+    }
+
     @PostMapping
     public ResponseEntity<SpaceResponse> createSpace(@Valid @RequestBody CreateSpaceRequest request) {
         String username = getCurrentUsername();
         SpaceResponse response = parkingSpaceService.createSpace(username, request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<SpaceResponse> updateSpace(
+            @PathVariable Long id,
+            @Valid @RequestBody CreateSpaceRequest request
+    ) {
+        SpaceResponse response = parkingSpaceService.updateSpace(id, getCurrentUsername(), request);
+        return ResponseEntity.ok(response);
     }
 
     private String getCurrentUsername() {

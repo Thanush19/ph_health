@@ -74,6 +74,41 @@ public class ParkingSpaceService {
                 .toList();
     }
 
+    public List<SpaceResponse> listMySpaces(String ownerUsername) {
+        Long ownerId = userService.getUserIdByUsername(ownerUsername);
+        return parkingSpaceRepository.findByOwnerIdOrderByCreatedAtDesc(ownerId).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    public SpaceResponse getById(Long id) {
+        return parkingSpaceRepository.findById(id)
+                .map(this::toResponse)
+                .orElseThrow(() -> new IllegalArgumentException("Space not found: " + id));
+    }
+
+    public SpaceResponse updateSpace(Long id, String ownerUsername, CreateSpaceRequest request) {
+        validateAtLeastOneRentOption(request.getRentPerHour(), request.getRentPerDay(), request.getRentMonthly());
+        ParkingSpace space = parkingSpaceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Space not found: " + id));
+        Long ownerId = userService.getUserIdByUsername(ownerUsername);
+        if (!space.getOwnerId().equals(ownerId)) {
+            throw new IllegalArgumentException("Not allowed to update this space");
+        }
+        String imageUrlsStr = request.getImageUrls() != null && !request.getImageUrls().isEmpty()
+                ? String.join(",", request.getImageUrls())
+                : null;
+        space.setAddress(request.getAddress());
+        space.setSquareFeet(request.getSquareFeet());
+        space.setVehicleTypes(request.getVehicleTypes());
+        space.setRentPerHour(request.getRentPerHour());
+        space.setRentPerDay(request.getRentPerDay());
+        space.setRentMonthly(request.getRentMonthly());
+        space.setImageUrls(imageUrlsStr);
+        space = parkingSpaceRepository.save(space);
+        return toResponse(space);
+    }
+
     private void validateAtLeastOneRentOption(BigDecimal perHour, BigDecimal perDay, BigDecimal monthly) {
         boolean hasAny = (perHour != null && perHour.compareTo(BigDecimal.ZERO) > 0)
                 || (perDay != null && perDay.compareTo(BigDecimal.ZERO) > 0)
