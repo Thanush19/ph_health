@@ -74,7 +74,7 @@ fun FindParking(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No parking spaces available yet.",
+                        text = "No spaces listed yet. Be the first to list your land.",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -105,10 +105,10 @@ private fun TopBar(
     onBackClick: () -> Unit
 ) {
     TopAppBar(
-        title = { Text(title, style = MaterialTheme.typography.titleLarge) },
+        title = { Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold) },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
-                Text("←", style = MaterialTheme.typography.titleLarge)
+                Text("←", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
             }
         }
     )
@@ -125,7 +125,8 @@ private fun ParkingSpaceCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {

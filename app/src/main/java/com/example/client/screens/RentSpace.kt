@@ -17,17 +17,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,6 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.example.client.ui.components.ParkingPrimaryButton
+import com.example.client.ui.components.ParkingTextField
 import com.example.client.viewModels.RentSpaceEvent
 import com.example.client.viewModels.RentSpaceUiEvent
 import com.example.client.viewModels.RentSpaceViewModel
@@ -68,7 +68,7 @@ fun RentSpace(
                 onNavigateBack()
                 viewModel.clearNavigationEvent()
             }
-            null -> { }
+            null -> {}
         }
     }
 
@@ -79,9 +79,7 @@ fun RentSpace(
             if (uiModel.imagePaths.size >= MAX_IMAGES) return@let
             val tempFile = File(context.cacheDir, "space_${System.currentTimeMillis()}.jpg")
             context.contentResolver.openInputStream(it)?.use { input ->
-                FileOutputStream(tempFile).use { output ->
-                    input.copyTo(output)
-                }
+                FileOutputStream(tempFile).use { output -> input.copyTo(output) }
             }
             viewModel.takeEvent(RentSpaceEvent.ImageAdded(tempFile.absolutePath))
         }
@@ -91,9 +89,7 @@ fun RentSpace(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
         cameraFile?.let { file ->
-            if (success && file.exists()) {
-                viewModel.takeEvent(RentSpaceEvent.ImageAdded(file.absolutePath))
-            }
+            if (success && file.exists()) viewModel.takeEvent(RentSpaceEvent.ImageAdded(file.absolutePath))
             cameraFile = null
         }
     }
@@ -104,12 +100,9 @@ fun RentSpace(
         if (granted) {
             val f = File(context.cacheDir, "capture_${System.currentTimeMillis()}.jpg")
             cameraFile = f
-            val uri = FileProvider.getUriForFile(
-                context,
-                "${context.packageName}.fileprovider",
-                f
+            cameraLauncher.launch(
+                FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", f)
             )
-            cameraLauncher.launch(uri)
         }
     }
 
@@ -123,110 +116,106 @@ fun RentSpace(
         galleryLauncher.launch("image/*")
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp)
-            .verticalScroll(rememberScrollState())
-    ) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        RentSpaceTopBar(onBackClick = onNavigateBack)
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(24.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
         Text(
-            text = "Rent Your Space",
+            text = "List your space",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        TextField(
-            value = uiModel.address,
-            onValueChange = { viewModel.takeEvent(RentSpaceEvent.AddressChanged(it)) },
-            label = { Text("Address") },
-            placeholder = { Text("Full address of the space") },
-            singleLine = false,
-            maxLines = 2,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !uiModel.isLoading,
-            colors = textFieldColors()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextField(
-            value = uiModel.squareFeet,
-            onValueChange = { viewModel.takeEvent(RentSpaceEvent.SquareFeetChanged(it)) },
-            label = { Text("Square feet") },
-            placeholder = { Text("e.g. 150") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !uiModel.isLoading,
-            colors = textFieldColors()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextField(
-            value = uiModel.vehicleTypes,
-            onValueChange = { viewModel.takeEvent(RentSpaceEvent.VehicleTypesChanged(it)) },
-            label = { Text("Vehicle types") },
-            placeholder = { Text("e.g. Car, Bike, SUV") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !uiModel.isLoading,
-            colors = textFieldColors()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Rent (set at least one)",
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurface
-        )
         Spacer(modifier = Modifier.height(8.dp))
 
-        TextField(
-            value = uiModel.rentPerHour,
-            onValueChange = { viewModel.takeEvent(RentSpaceEvent.RentPerHourChanged(it)) },
-            label = { Text("Per hour") },
-            placeholder = { Text("0 or leave empty") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !uiModel.isLoading,
-            colors = textFieldColors()
+        Text(
+            text = "Rent out your land for parking",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        TextField(
-            value = uiModel.rentPerDay,
-            onValueChange = { viewModel.takeEvent(RentSpaceEvent.RentPerDayChanged(it)) },
-            label = { Text("Per day") },
-            placeholder = { Text("0 or leave empty") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !uiModel.isLoading,
-            colors = textFieldColors()
+        ParkingTextField(
+            value = uiModel.address,
+            onValueChange = { viewModel.takeEvent(RentSpaceEvent.AddressChanged(it)) },
+            label = "Address",
+            placeholder = "Full address of the space",
+            singleLine = false,
+            maxLines = 2,
+            enabled = !uiModel.isLoading
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        TextField(
-            value = uiModel.rentMonthly,
-            onValueChange = { viewModel.takeEvent(RentSpaceEvent.RentMonthlyChanged(it)) },
-            label = { Text("Monthly") },
-            placeholder = { Text("0 or leave empty") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !uiModel.isLoading,
-            colors = textFieldColors()
+        ParkingTextField(
+            value = uiModel.squareFeet,
+            onValueChange = { viewModel.takeEvent(RentSpaceEvent.SquareFeetChanged(it)) },
+            label = "Square feet",
+            placeholder = "e.g. 150",
+            enabled = !uiModel.isLoading
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        ParkingTextField(
+            value = uiModel.vehicleTypes,
+            onValueChange = { viewModel.takeEvent(RentSpaceEvent.VehicleTypesChanged(it)) },
+            label = "Vehicle types",
+            placeholder = "e.g. Car, Bike, SUV",
+            enabled = !uiModel.isLoading
         )
 
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
+            text = "Rent (set at least one)",
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        ParkingTextField(
+            value = uiModel.rentPerHour,
+            onValueChange = { viewModel.takeEvent(RentSpaceEvent.RentPerHourChanged(it)) },
+            label = "Per hour (Rs.)",
+            placeholder = "0 or leave empty",
+            enabled = !uiModel.isLoading
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        ParkingTextField(
+            value = uiModel.rentPerDay,
+            onValueChange = { viewModel.takeEvent(RentSpaceEvent.RentPerDayChanged(it)) },
+            label = "Per day (Rs.)",
+            placeholder = "0 or leave empty",
+            enabled = !uiModel.isLoading
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        ParkingTextField(
+            value = uiModel.rentMonthly,
+            onValueChange = { viewModel.takeEvent(RentSpaceEvent.RentMonthlyChanged(it)) },
+            label = "Monthly (Rs.)",
+            placeholder = "0 or leave empty",
+            enabled = !uiModel.isLoading
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text(
             text = "Photos (up to $MAX_IMAGES)",
             style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -239,7 +228,8 @@ fun RentSpace(
             uiModel.imagePaths.forEachIndexed { index, path ->
                 Card(
                     modifier = Modifier.size(96.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Box(modifier = Modifier.fillMaxSize()) {
@@ -251,22 +241,21 @@ fun RentSpace(
                         )
                         IconButton(
                             onClick = { viewModel.takeEvent(RentSpaceEvent.RemoveImage(index)) },
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .size(32.dp)
+                            modifier = Modifier.align(Alignment.TopEnd).size(32.dp)
                         ) {
-                            Text("×", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
+                            Text("×", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
                 }
             }
             if (uiModel.imagePaths.size < MAX_IMAGES) {
-                Button(
+                OutlinedButton(
                     onClick = { showUploadDialog = true },
-                    modifier = Modifier.height(40.dp),
-                    enabled = !uiModel.isLoading
+                    modifier = Modifier.height(48.dp),
+                    enabled = !uiModel.isLoading,
+                    shape = MaterialTheme.shapes.medium
                 ) {
-                    Text("Upload image")
+                    Text("Add photo", style = MaterialTheme.typography.labelLarge)
                 }
             }
         }
@@ -275,7 +264,7 @@ fun RentSpace(
             AlertDialog(
                 onDismissRequest = { showUploadDialog = false },
                 confirmButton = {},
-                title = { Text("Upload a photo") },
+                title = { Text("Add photo", style = MaterialTheme.typography.titleMedium) },
                 text = {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         TextButton(
@@ -284,7 +273,7 @@ fun RentSpace(
                                 launchGallery()
                             }
                         ) {
-                            Text("Photo from gallery")
+                            Text("From gallery", color = MaterialTheme.colorScheme.onSurface)
                         }
                         TextButton(
                             onClick = {
@@ -292,13 +281,13 @@ fun RentSpace(
                                 launchCamera()
                             }
                         ) {
-                            Text("Capture image")
+                            Text("Take photo", color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showUploadDialog = false }) {
-                        Text("Cancel", color = MaterialTheme.colorScheme.onSurface)
+                        Text("Cancel", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             )
@@ -315,36 +304,25 @@ fun RentSpace(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Button(
+        ParkingPrimaryButton(
+            text = "List space",
             onClick = { viewModel.takeEvent(RentSpaceEvent.Submit) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
             enabled = !uiModel.isLoading,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            )
-        ) {
-            if (uiModel.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.height(24.dp),
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            } else {
-                Text("Submit listing", style = MaterialTheme.typography.titleMedium)
-            }
+            loading = uiModel.isLoading
+        )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun textFieldColors() = TextFieldDefaults.colors(
-    focusedTextColor = MaterialTheme.colorScheme.onSurface,
-    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-    focusedLabelColor = MaterialTheme.colorScheme.primary,
-    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-    unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
-    cursorColor = MaterialTheme.colorScheme.primary
-)
+private fun RentSpaceTopBar(onBackClick: () -> Unit) {
+    TopAppBar(
+        title = { Text("List your space", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold) },
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Text("←", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
+            }
+        }
+    )
+}

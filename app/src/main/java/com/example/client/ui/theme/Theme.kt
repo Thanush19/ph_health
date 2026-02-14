@@ -1,35 +1,49 @@
 package com.example.client.ui.theme
 
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import com.example.client.ui.theme.Black
-import com.example.client.ui.theme.White
+import androidx.compose.ui.unit.dp
 
 private val LightColorScheme = lightColorScheme(
     primary = Black,
     secondary = Black,
     tertiary = Black,
     background = White,
-    surface = White,
-    onPrimary = White,
-    onSecondary = White,
-    onTertiary = White,
+    surface = SurfaceLight,
+    surfaceVariant = SurfaceVariantLight,
+    onPrimary = WhitePure,
+    onSecondary = WhitePure,
+    onTertiary = WhitePure,
     onBackground = Black,
-    onSurface = Black,
-    outline = Black,
-    outlineVariant = Black.copy(alpha = 0.3f)
+    onSurface = OnSurfaceLight,
+    onSurfaceVariant = OnSurfaceVariantLight,
+    outline = OutlineLight,
+    outlineVariant = OutlineVariantLight,
+    error = ErrorDark,
+    onError = WhitePure
+)
+
+private val AppShapes = Shapes(
+    extraSmall = RoundedCornerShape(6.dp),
+    small = RoundedCornerShape(10.dp),
+    medium = RoundedCornerShape(14.dp),
+    large = RoundedCornerShape(18.dp),
+    extraLarge = RoundedCornerShape(24.dp)
 )
 
 @Composable
 fun ClientTheme(
-    darkTheme: Boolean = false, // Always use light theme for black and white
-    dynamicColor: Boolean = false, // Disable dynamic colors
+    darkTheme: Boolean = false,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
         colorScheme = LightColorScheme,
         typography = Typography,
+        shapes = AppShapes,
         content = content
     )
 }

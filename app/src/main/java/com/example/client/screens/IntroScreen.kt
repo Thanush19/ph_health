@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.client.ui.components.ParkingPrimaryButton
 
 @Composable
 fun IntroScreen(
@@ -36,41 +35,28 @@ fun IntroScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "PH Health Checker",
-                style = MaterialTheme.typography.displayMedium,
+                text = "Spot",
+                style = MaterialTheme.typography.displayLarge,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onBackground
             )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             Text(
-                text = "Welcome",
+                text = "Rent your land. Find parking.",
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            
+
             Spacer(modifier = Modifier.height(64.dp))
-            
-            Button(
-                onClick = onGetStartedClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                ),
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Text(
-                    text = "Get Started",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
-                )
-            }
+
+            ParkingPrimaryButton(
+                text = "Get started",
+                onClick = onGetStartedClick
+            )
         }
     }
 }
@@ -78,5 +64,7 @@ fun IntroScreen(
 @Preview(showBackground = true)
 @Composable
 fun IntroScreenPreview() {
-    IntroScreen()
+    com.example.client.ui.theme.ClientTheme {
+        IntroScreen()
+    }
 }
