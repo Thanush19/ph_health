@@ -2,9 +2,11 @@ package com.example.client.data.api
 
 import com.example.client.data.model.CreateSpaceRequest
 import com.example.client.data.model.ImageUploadResponse
+import com.example.client.data.model.LikeResponse
 import com.example.client.data.model.SpaceResponse
 import okhttp3.MultipartBody
 import retrofit2.Response
+import retrofit2.http.DELETE
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
@@ -33,4 +35,13 @@ interface SpaceApiService {
 
     @PUT("api/spaces/{id}")
     suspend fun updateSpace(@Path("id") id: Long, @Body request: CreateSpaceRequest): Response<SpaceResponse>
+
+    @GET("api/spaces/{id}/like")
+    suspend fun getLike(@Path("id") id: Long): Response<LikeResponse>
+
+    @POST("api/spaces/{id}/like")
+    suspend fun like(@Path("id") id: Long): Response<LikeResponse>
+
+    @DELETE("api/spaces/{id}/like")
+    suspend fun unlike(@Path("id") id: Long): Response<LikeResponse>
 }

@@ -106,7 +106,7 @@ class RentSpacePresenter @Inject constructor(
         }
     }
 
-    private suspend fun handleSubmit() {
+    private suspend fun  handleSubmit() {
         state.isLoading = true
         state.errorMessage = null
         state.event = null

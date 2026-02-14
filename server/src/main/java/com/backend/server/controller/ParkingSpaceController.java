@@ -2,7 +2,9 @@ package com.backend.server.controller;
 
 import com.backend.server.dto.CreateSpaceRequest;
 import com.backend.server.dto.ImageUploadResponse;
+import com.backend.server.dto.LikeResponse;
 import com.backend.server.dto.SpaceResponse;
+import com.backend.server.service.LikeService;
 import com.backend.server.service.ParkingSpaceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ import java.util.List;
 public class ParkingSpaceController {
 
     private final ParkingSpaceService parkingSpaceService;
+    private final LikeService likeService;
 
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ImageUploadResponse> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
@@ -59,6 +62,21 @@ public class ParkingSpaceController {
     ) {
         SpaceResponse response = parkingSpaceService.updateSpace(id, getCurrentUsername(), request);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}/like")
+    public ResponseEntity<LikeResponse> getLike(@PathVariable Long id) {
+        return ResponseEntity.ok(likeService.getLikeInfo(id, getCurrentUsername()));
+    }
+
+    @PostMapping("/{id}/like")
+    public ResponseEntity<LikeResponse> like(@PathVariable Long id) {
+        return ResponseEntity.ok(likeService.like(id, getCurrentUsername()));
+    }
+
+    @DeleteMapping("/{id}/like")
+    public ResponseEntity<LikeResponse> unlike(@PathVariable Long id) {
+        return ResponseEntity.ok(likeService.unlike(id, getCurrentUsername()));
     }
 
     private String getCurrentUsername() {

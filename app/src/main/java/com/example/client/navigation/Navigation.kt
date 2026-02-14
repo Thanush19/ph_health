@@ -14,6 +14,8 @@ import com.example.client.screens.IntroScreen
 import com.example.client.screens.Login
 import com.example.client.screens.MainTabScreen
 import com.example.client.screens.MyRentalSpacesScreen
+import com.example.client.screens.BookSlotScreen
+import com.example.client.screens.ChatScreen
 import com.example.client.screens.ParkingDetails
 import com.example.client.screens.Register
 import com.example.client.screens.RentSpace
@@ -26,6 +28,8 @@ sealed class Screen(val route: String) {
     object RentSpace : Screen("rent_space")
     object FindParking : Screen("find_parking")
     object ParkingDetails : Screen("parking_details")
+    object BookSlot : Screen("book_slot")
+    object Chat : Screen("chat")
     object Activities : Screen("activities")
     object MyRentalSpaces : Screen("my_rental_spaces")
     object EditSpace : Screen("edit_space")
@@ -100,9 +104,31 @@ fun AppNavigation(navController: NavHostController) {
                 space = SelectedSpaceHolder.space,
                 onNavigateBack = { navController.popBackStack() },
                 canEdit = SelectedSpaceHolder.canEdit,
-                onEditClick = {
-                    navController.navigate(Screen.EditSpace.route)
+                onEditClick = { navController.navigate(Screen.EditSpace.route) },
+                onRentNowClick = { space ->
+                    SelectedSpaceHolder.space = space
+                    navController.navigate(Screen.BookSlot.route)
+                },
+                onBookSlotClick = { space ->
+                    SelectedSpaceHolder.space = space
+                    navController.navigate(Screen.BookSlot.route)
+                },
+                onChatClick = { space ->
+                    SelectedSpaceHolder.space = space
+                    navController.navigate(Screen.Chat.route)
                 }
+            )
+        }
+        composable(Screen.BookSlot.route) {
+            BookSlotScreen(
+                space = SelectedSpaceHolder.space,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable(Screen.Chat.route) {
+            ChatScreen(
+                space = SelectedSpaceHolder.space,
+                onNavigateBack = { navController.popBackStack() }
             )
         }
         composable(Screen.Activities.route) {

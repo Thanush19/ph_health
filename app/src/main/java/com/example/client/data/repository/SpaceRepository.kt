@@ -3,6 +3,7 @@ package com.example.client.data.repository
 import com.example.client.data.api.SpaceApiService
 import com.example.client.data.model.CreateSpaceRequest
 import com.example.client.data.model.ImageUploadResponse
+import com.example.client.data.model.LikeResponse
 import com.example.client.data.model.SpaceResponse
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -92,6 +93,45 @@ class SpaceRepository @Inject constructor(
                 Result.success(response.body()!!)
             } else {
                 Result.failure(Exception("Update failed: ${response.errorBody()?.string() ?: "Unknown error"}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getLike(spaceId: Long): Result<LikeResponse> {
+        return try {
+            val response = apiService.getLike(spaceId)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Failed to load like info"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun like(spaceId: Long): Result<LikeResponse> {
+        return try {
+            val response = apiService.like(spaceId)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Failed to like"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun unlike(spaceId: Long): Result<LikeResponse> {
+        return try {
+            val response = apiService.unlike(spaceId)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Failed to unlike"))
             }
         } catch (e: Exception) {
             Result.failure(e)

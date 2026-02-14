@@ -2,6 +2,8 @@ package com.example.client.di
 
 import com.example.client.data.api.AuthApiService
 import com.example.client.data.api.AuthInterceptor
+import com.example.client.data.api.BookingApiService
+import com.example.client.data.api.ChatApiService
 import com.example.client.data.api.SpaceApiService
 import dagger.Module
 import dagger.Provides
@@ -55,5 +57,17 @@ object NetworkModule {
     @Singleton
     fun provideSpaceApiService(retrofit: Retrofit): SpaceApiService {
         return retrofit.create(SpaceApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideBookingApiService(retrofit: Retrofit): BookingApiService {
+        return retrofit.create(BookingApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideChatApiService(retrofit: Retrofit): ChatApiService {
+        return retrofit.create(ChatApiService::class.java)
     }
 }

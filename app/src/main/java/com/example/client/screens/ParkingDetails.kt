@@ -24,12 +24,21 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -38,15 +47,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.client.data.model.SpaceResponse
+import com.example.client.viewModels.ParkingDetailsViewModel
 
 @Composable
 fun ParkingDetails(
     space: SpaceResponse?,
     onNavigateBack: () -> Unit = {},
     canEdit: Boolean = false,
-    onEditClick: () -> Unit = {}
+    onEditClick: () -> Unit = {},
+    onRentNowClick: (SpaceResponse) -> Unit = {},
+    onBookSlotClick: (SpaceResponse) -> Unit = {},
+    onChatClick: (SpaceResponse) -> Unit = {},
+    viewModel: ParkingDetailsViewModel = hiltViewModel()
 ) {
     if (space == null) {
         Box(
@@ -57,6 +72,11 @@ fun ParkingDetails(
         }
         return
     }
+
+    LaunchedEffect(space) {
+        viewModel.setSpace(space)
+    }
+    val detailsState by viewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -118,6 +138,54 @@ fun ParkingDetails(
 
                 space.createdAt?.let { createdAt ->
                     DetailRow(label = "Listed on", value = createdAt.take(10))
+                }
+
+                if (!canEdit) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        IconButton(
+                            onClick = { viewModel.toggleLike() },
+                            enabled = !detailsState.likeLoading
+                        ) {
+                            if (detailsState.likeLoading) {
+                                CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                            } else {
+                                Icon(
+                                    imageVector = if (detailsState.likedByMe) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                    contentDescription = "Like",
+                                    tint = if (detailsState.likedByMe) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                        Text(
+                            text = "${detailsState.likeCount}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        onClick = { onRentNowClick(space) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Rent now")
+                    }
+                    OutlinedButton(
+                        onClick = { onBookSlotClick(space) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Book my slot")
+                    }
+                    OutlinedButton(
+                        onClick = { onChatClick(space) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Chat with space owner")
+                    }
                 }
             }
         }
