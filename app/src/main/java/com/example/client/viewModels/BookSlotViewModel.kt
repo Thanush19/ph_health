@@ -26,8 +26,8 @@ data class BookSlotUiState(
     val displayMonth: Int = 0,
     val selectedStartDate: SimpleDate? = null,
     val selectedEndDate: SimpleDate? = null,
-    val startTime: String = "09:00",
-    val endTime: String = "17:00",
+    val startTime: String = "9:00 AM",
+    val endTime: String = "5:00 PM",
     val booking: BookingResponse? = null,
     val bookingLoading: Boolean = false,
     val paymentLoading: Boolean = false,
@@ -100,8 +100,8 @@ class BookSlotViewModel @Inject constructor(
         val space = currentSpace ?: return
         val start = _uiState.value.selectedStartDate ?: return
         val end = _uiState.value.selectedEndDate ?: start
-        val st = _uiState.value.startTime.ifBlank { "09:00" }
-        val et = _uiState.value.endTime.ifBlank { "17:00" }
+        val st = time12hTo24h(_uiState.value.startTime.ifBlank { "9:00 AM" })
+        val et = time12hTo24h(_uiState.value.endTime.ifBlank { "5:00 PM" })
         val slotStartStr = "${start.toIsoDateString()}T${st}:00"
         val slotEndStr = "${end.toIsoDateString()}T${et}:00"
         viewModelScope.launch {
@@ -142,5 +142,21 @@ class BookSlotViewModel @Inject constructor(
                     )
                 }
         }
+    }
+
+    /** Converts 12-hour time (e.g. "9:00 AM", "5:30 PM") to 24-hour "HH:mm". */
+    private fun time12hTo24h(input: String): String {
+        val s = input.trim().uppercase()
+        if (s.isEmpty()) return "09:00"
+        val regex = Regex("""(\d{1,2}):?(\d{2})?\s*(AM|PM)?""")
+        val match = regex.find(s) ?: return "09:00"
+        var hour = match.groupValues[1].toIntOrNull() ?: 9
+        val min = match.groupValues[2].takeIf { it.isNotEmpty() }?.toIntOrNull() ?: 0
+        when {
+            s.contains("PM") && hour != 12 -> hour += 12
+            s.contains("AM") && hour == 12 -> hour = 0
+        }
+        hour = hour.coerceIn(0, 23)
+        return "${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}"
     }
 }

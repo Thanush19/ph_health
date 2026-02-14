@@ -49,11 +49,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.client.data.model.SpaceResponse
 import com.example.client.ui.components.SlotCalendar
 import com.example.client.viewModels.BookSlotViewModel
+import com.example.client.viewModels.SimpleDate
 
 private fun monthName(month: Int): String {
     val names = listOf("January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December")
     return names.getOrElse(month - 1) { "" }
+}
+
+private fun formatSelectedDate(d: SimpleDate): String {
+    val shortMonths = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+    val m = shortMonths.getOrElse(d.month - 1) { "" }
+    return "$m ${d.day}, ${d.year}"
 }
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
@@ -166,8 +174,44 @@ fun BookSlotScreen(
                 }
             }
 
+            if (uiState.selectedStartDate != null) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                ) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Text(
+                            text = "Selected dates",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = "From: ${formatSelectedDate(uiState.selectedStartDate!!)}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        if (uiState.selectedEndDate != null) {
+                            Text(
+                                text = "To: ${formatSelectedDate(uiState.selectedEndDate!!)}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        } else {
+                            Text(
+                                text = "To: Same day (tap another date for range)",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            }
+
             Text(
-                text = "Time",
+                text = "Time (12-hour)",
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -178,14 +222,14 @@ fun BookSlotScreen(
                 OutlinedTextField(
                     value = uiState.startTime,
                     onValueChange = { viewModel.setStartTime(it) },
-                    label = { Text("Start (e.g. 09:00)") },
+                    label = { Text("Start (e.g. 9:00 AM)") },
                     modifier = Modifier.weight(1f),
                     singleLine = true
                 )
                 OutlinedTextField(
                     value = uiState.endTime,
                     onValueChange = { viewModel.setEndTime(it) },
-                    label = { Text("End (e.g. 17:00)") },
+                    label = { Text("End (e.g. 5:00 PM)") },
                     modifier = Modifier.weight(1f),
                     singleLine = true
                 )
