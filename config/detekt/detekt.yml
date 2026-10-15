@@ -1,0 +1,55 @@
+config:
+  validation: true
+  warningsAsErrors: false
+
+complexity:
+
+  LongMethod:
+    active: true
+    allowedLines: 60
+
+  LargeClass:
+    active: true
+    allowedLines: 600
+
+  CyclomaticComplexMethod:
+    active: true
+    allowedComplexity: 10
+
+  ComplexCondition:
+    active: true
+
+  NestedBlockDepth:
+    active: true
+    allowedDepth: 3
+
+  LongParameterList:
+    active: true
+
+style:
+
+  MagicNumber:
+    active: true
+
+  WildcardImport:
+    active: true
+
+  ForbiddenMethodCall:
+    active: true
+    methods:
+      - "kotlin.io.println"
+
+naming:
+
+  FunctionNaming:
+    active: true
+    ignoreAnnotated:
+      - "Composable"
+
+empty-blocks:
+
+  EmptyCatchBlock:
+    active: true
+
+  EmptyFunctionBlock:
+    active: true
